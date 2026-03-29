@@ -27,7 +27,7 @@
 | TA | 6–28 | ~27.4 pps | De Luca & Hostage 2010; Connelly et al. 1999 |
 | FDI | 8–33 | ~32.7 pps | De Luca & Hostage 2010 |
 | Biceps | 6–25 | 17.8–24.7 Hz | Solomonow et al. 1990 |
-| Facial | 10–40 | — | Van Boxtel & Schomaker 1983 |
+| Facial | 10–40 | ~76 pps | Van Boxtel & Schomaker 1983 |
 | All muscles (low-mod effort) | upper limit 12–15 Hz | — | Rubin & Lamb 2023 |
 
 ### Motor Unit Counts / Innervation Ratios
@@ -36,9 +36,9 @@
 |--------|---------|------------------|--------|
 | FDI | ~120 | ~340 | Feinstein et al. 1955 |
 | Tibialis Anterior | ~445 | 329–562 | Feinstein 1955; Gath & Stalberg 1981 |
-| Biceps Brachii | — | 209–750 | Buchthal et al. 1959; Gath & Stalberg 1981 |
-| Deltoid | — | ~339 | Gath & Stalberg 1981 |
-| Gastrocnemius | — | ~1934 | Feinstein et al. 1955 |
+| Biceps Brachii | ~774 | 209–750 | Buchthal et al. 1959; Gath & Stalberg 1981 |
+| Deltoid | ~109 | ~339 | Gath & Stalberg 1981 |
+| Gastrocnemius | N/A | ~1934 | Feinstein et al. 1955 |
 
 ### Recruitment Physiology
 
