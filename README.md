@@ -1,4 +1,4 @@
-# synEMG_PPG
+# Synthetic Physiologically Plausible EMG and PPG Signal Modeling
 Research contribution made from ICAM (2026). Open source for all researchers in biomedical fields to use where there is lack of real EMG and PPG data collected. 
 
 ## Files
@@ -117,16 +117,24 @@ t, ppg = generate_ppg_signal(duration=60, fs=100, **params)
 ```
 
 ---
-
 ## Citing
+If you use these generators in your research, please cite this software and the relevant literature sources listed in the bibliography files.
+This software
+`` Fatima SZ. (2026) Synthetic Physiologically Plausible EMG and PPG Signal Modeling. 
+GitHub.``
 
-If you use these generators in your research, please cite the relevant literature sources listed in the bibliography files. The key references are:
+``bibtex@software{fatima2026biosignal,
+  author       = {Fatima, Syeda Zainab},
+  title        = {Synthetic Physiologically Plausible EMG and PPG Signal Modeling},
+  year         = {2026},
+}``
 
-- **EMG durations:** Buchthal F, Rosenfalck P. (1955) *Acta Psychiatr Neurol Scand.* 30:125-131.
-- **EMG firing rates:** De Luca CJ, Hostage EC. (2010) *J Neurophysiol.* 104(2):1034-1046.
-- **PPG morphology:** Elgendi M. (2012) *Curr Cardiol Rev.* 8(1):14-25.
-- **HRV standards:** Task Force of ESC and NASPE. (1996) *Circulation.* 93:1043-1065.
+Key literature references used
 
+EMG durations: Buchthal F, Rosenfalck P. (1955) Acta Psychiatr Neurol Scand. 30:125-131.
+EMG firing rates: De Luca CJ, Hostage EC. (2010) J Neurophysiol. 104(2):1034-1046.
+PPG morphology: Elgendi M. (2012) Curr Cardiol Rev. 8(1):14-25.
+HRV standards: Task Force of ESC and NASPE. (1996) Circulation. 93:1043-1065.
 ---
 
 ## Requirements
