@@ -1,4 +1,5 @@
  
+ 
 # ---------------------------------------------------------------------------
 # MUAP template generation - morphology-driven per muscle
 #
@@ -6,10 +7,15 @@
 # burst generated via gaussian envelopes.
 # Literature-based realistic MUAPs have biphasic/triphasic morphology.
 #
-# The novel aspect here: rather than one fixed template, the triphasic
-# shape (phase timing, widths, amplitude ratios) is parameterized by
-# muscle profile. This means the MUAP waveform itself changes between
-# muscles, not just the amplitude or firing rate on top of it.
+# NOVEL CONTRIBUTION: rather than one fixed template that is scaled, the
+# triphasic shape (phase timing, widths, amplitude ratios) is parameterized
+# by muscle profile. The MUAP waveform itself changes between muscles.
+# The Gaussian envelope triphasic model is the standard approach for MUAP
+# simulation (Stashuk 2001, Nandedkar et al. 1988), but parameterizing
+# it per-muscle with literature-derived durations and proportional phase
+# scaling is our contribution. The phase_centers, phase_widths, and
+# phase_amplitudes values are scaled proportionally to the Buchthal
+# duration; they are NOT directly from a single paper.
 # ---------------------------------------------------------------------------
  
 def _muap_template(fs, profile: MuscleProfile):
@@ -23,8 +29,13 @@ def _muap_template(fs, profile: MuscleProfile):
       Phase 3 (late positive)    - action potential receding + afterwave
  
     Each phase is a Gaussian whose center, width, and amplitude come
-    from the muscle profile. This gives you physiologically distinct
+    from the muscle profile. This gives physiologically distinct
     waveforms per muscle rather than one-size-fits-all.
+ 
+    NOTE: the Gaussian triphasic decomposition is a standard simulation
+    technique (Stashuk 2001, Nandedkar et al. 1988). Our novel aspect
+    is parameterizing it per muscle using the Buchthal duration as the
+    scaling anchor.
     """
     duration_ms = profile.muap_duration_ms
     L = int(max(5, round((duration_ms / 1000.0) * fs)))
@@ -40,7 +51,7 @@ def _muap_template(fs, profile: MuscleProfile):
     t_p2 = centers[1] * t_mean
     t_p3 = centers[2] * t_mean
  
-    # Diaphragmatic MUAPs: initial positive, main negative, small positive afterwave
+    # Triphasic MUAP: initial positive, main negative, small positive afterwave
     # This triphasic structure generalizes to all muscles with different parameters
     tpl = (
         amps[0] * np.exp(-((tt - t_p1) ** 2) / (2 * widths[0] ** 2))
@@ -56,13 +67,21 @@ def _muap_template(fs, profile: MuscleProfile):
 # Recruitment model
 #
 # Size principle: smaller motor units are recruited first and fire at
-# higher rates. As contraction level increases, larger (and slower-firing)
-# units join in. This is modeled by scaling the number of active MUAPs
-# and adjusting their firing rates based on the target amplitude.
+# higher rates (Henneman 1957). As contraction level increases, larger
+# (and slower-firing) units join in.
+#
+# The "onion skin" property (De Luca & Erim 1994, De Luca & Hostage 2010)
+# establishes that earlier-recruited motor units maintain higher firing
+# rates than later-recruited ones at any given force level.
 #
 # For "synchronous" recruitment (some facial/small muscles), motor units
 # tend to fire more in phase, producing a less interference-pattern-like
-# and more discrete-looking EMG.
+# and more discrete-looking EMG (Van Boxtel & Schomaker 1983).
+#
+# The "rule of fives" (Medscape EMG recruitment overview): motor units
+# begin firing at ~5 Hz, second MU recruited when first reaches ~10 Hz.
+# Rubin & Lamb 2023: fastest firing rate upper limit 12-15 Hz at
+# low-moderate contraction across six common muscles.
 # ---------------------------------------------------------------------------
  
 def _recruit_firing_rate(
@@ -82,7 +101,6 @@ def _recruit_firing_rate(
  
     if profile.recruitment_style == "synchronous":
         # synchronous: fewer units fire but more in unison
-        # firing rate climbs faster, recruitment is flatter
         firing_rate = fr_min + (fr_max - fr_min) * min(1.0, level * 1.2)
         n_active = 0.4 + 0.4 * min(1.0, level)
     else:
@@ -123,11 +141,11 @@ def generate_emg_signal(
         Sampling frequency in Hz.
     muscle : str or MuscleProfile
         Either a key from MUSCLE_PROFILES (e.g., "biceps_brachii") or
-        a custom MuscleProfile instance you built yourself.
+        a custom MuscleProfile.
     contraction_rate : float
         Rate of phasic contractions per minute (for phasic pattern),
         or ignored for tonic pattern. For respiratory muscles this is
-        your breaths per minute.
+        breaths per minute.
     contraction_pattern : str
         "phasic" for rhythmic bursts (breathing, gait, etc.) or
         "tonic" for sustained contraction (postural, isometric hold).
@@ -170,12 +188,12 @@ def generate_emg_signal(
         burst_times = np.arange(0.5 * burst_interval, duration, burst_interval)
     elif contraction_pattern == "tonic":
         # for tonic, we tile overlapping bursts to create continuous activity
-        # burst spacing is ~1 burst duration so they overlap into sustained signal
         burst_dur_mid = np.mean(profile.burst_duration_range)
         burst_times = np.arange(0.0, duration, burst_dur_mid * 0.7)
     else:
         raise ValueError(
-            f"contraction_pattern must be 'phasic' or 'tonic', got '{contraction_pattern}'"
+            f"contraction_pattern must be 'phasic' or 'tonic', "
+            f"got '{contraction_pattern}'"
         )
  
     # will be used in for loop below - muscle-specific realistic MUAP
@@ -236,7 +254,8 @@ def generate_emg_signal(
                 1, int(round(firing_rate_hz * burst_duration * active_fraction))
             )
             spike_times_rel = np.sort(
-                np.random.rand(expected_spikes) * max(0.0, burst_duration - 1.0 / fs)
+                np.random.rand(expected_spikes)
+                * max(0.0, burst_duration - 1.0 / fs)
             )
  
             # synchronous recruitment: cluster spike times closer together
@@ -256,13 +275,16 @@ def generate_emg_signal(
         # Contraction envelope shape depends on pattern
         envelope_time = np.linspace(0, 1, N)
         if contraction_pattern == "phasic":
-            # Respiratory envelope - asymmetric like real inspiration (quick rise, slower fall)
+            # Respiratory envelope - asymmetric like real inspiration
+            # (quick rise, slower fall)
             respiratory_envelope = np.exp(-3 * envelope_time) * (
                 1 - np.exp(-8 * envelope_time)
             )
             env_max = np.max(respiratory_envelope)
             burst_envelope = (
-                respiratory_envelope / env_max if env_max > 0 else respiratory_envelope
+                respiratory_envelope / env_max
+                if env_max > 0
+                else respiratory_envelope
             )
         else:
             # tonic: trapezoidal with soft edges for sustained contraction
@@ -290,7 +312,7 @@ def generate_emg_signal(
  
     # gaussian features - subtle cardiac artifact common in surface EMG
     # amplitude depends on muscle proximity to heart
-    heart_rate_hz = np.random.uniform(1.0, 1.33)  # 60-80 bpm cardiac artifact
+    heart_rate_hz = np.random.uniform(1.0, 1.33)  # 60-80 bpm
     emg += profile.cardiac_artifact * np.sin(2 * np.pi * heart_rate_hz * t)
  
     # low frequency drift
@@ -303,17 +325,17 @@ def generate_emg_signal(
  
 # ---------------------------------------------------------------------------
 # Optional: parameter sampling for researchers who want randomized but
-# realistic configurations. You call this to get a dict of baseline
+# realistic configurations. Call this to get a dict of baseline
 # generation parameters, then unpack into generate_emg_signal().
 # ---------------------------------------------------------------------------
  
 def sample_emg_params(muscle="diaphragm", seed=None):
     """
     Sample randomized but physiologically plausible generation parameters
-    for a given muscle. Useful when you need many synthetic samples with
+    for a given muscle. Useful when there is a need for many synthetic samples with
     natural variation.
  
-    Returns a dict you can unpack directly into generate_emg_signal().
+    Returns a dict that can unpack directly into generate_emg_signal().
     """
     if seed is not None:
         np.random.seed(seed)
