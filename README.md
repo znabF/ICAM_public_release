@@ -5,7 +5,7 @@ Research contribution made from ICAM (2026). Open source for all researchers in 
 
 | File | Description |
 |------|-------------|
-| `emg/emg_generator.py` & `emg/muscle_specific.py` | Generalized EMG generator with muscle-specific MUAP morphology |
+| `emg/emg_generator.py` & `emg/muscleProfile.py` | Generalized EMG generator with muscle-specific MUAP morphology |
 | `ppg/ppg_generator.py` | Baseline PPG generator with physiological HRV and pulse morphology |
 ---
 
