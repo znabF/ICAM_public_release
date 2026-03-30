@@ -46,7 +46,8 @@ All MUAP durations are from Buchthal & Rosenfalck (1955), age 20-29. Firing rate
 ### Custom Muscle Profiles
 
 ```python
-from emg_model import MuscleProfile, generate_emg_signal
+from muscleProfile import MuscleProfile
+from emgGenerator import generate_emg_signal
 
 custom = MuscleProfile(
     name="My Custom Muscle",
@@ -81,7 +82,7 @@ t, emg = generate_emg_signal(duration=30, fs=1000, **params)
 ### Quick Start
 
 ```python
-from ppg_model import generate_ppg_signal
+from ppg_generator import generate_ppg_signal
 
 # Generate 60 seconds of resting PPG at 72 bpm
 t, ppg = generate_ppg_signal(duration=60, fs=100, heart_rate=72)
@@ -111,7 +112,7 @@ t, ppg = generate_ppg_signal(duration=60, fs=100, heart_rate=72)
 ### Batch Generation with Random Parameters
 
 ```python
-from ppg_model import sample_ppg_params, generate_ppg_signal
+from ppg_generator import sample_ppg_params, generate_ppg_signal
 
 params = sample_ppg_params(seed=42)
 t, ppg = generate_ppg_signal(duration=60, fs=100, **params)
@@ -130,13 +131,12 @@ GitHub.``
   year         = {2026},
 }``
 
-Key literature references used
+### Key literature references used
 
-EMG durations: Buchthal F, Rosenfalck P. (1955) Acta Psychiatr Neurol Scand. 30:125-131.
-EMG firing rates: De Luca CJ, Hostage EC. (2010) J Neurophysiol. 104(2):1034-1046.
-PPG morphology: Elgendi M. (2012) Curr Cardiol Rev. 8(1):14-25.
-HRV standards: Task Force of ESC and NASPE. (1996) Circulation. 93:1043-1065.
----
+* EMG durations: Buchthal F, Rosenfalck P. (1955) Acta Psychiatr Neurol Scand. 30:125-131.
+* EMG firing rates: De Luca CJ, Hostage EC. (2010) J Neurophysiol. 104(2):1034-1046.
+* PPG morphology: Elgendi M. (2012) Curr Cardiol Rev. 8(1):14-25.
+* HRV standards: Task Force of ESC and NASPE. (1996) Circulation. 93:1043-1065.
 
 ## Requirements
 
