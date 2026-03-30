@@ -14,8 +14,8 @@ Research contribution made from ICAM (2026). Open source for all researchers in 
 ### Quick Start
 
 ```python
-import generate_emg_signal
-import MUSCLE_PROFILES
+from emgGenerator import generate_emg_signal
+from muscleProfile import MUSCLE_PROFILES
 
 # Generate 30 seconds of diaphragm EMG at 15 breaths/min
 t, emg = generate_emg_signal(duration=30, fs=1000, muscle="diaphragm", contraction_rate=15)
