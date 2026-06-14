@@ -148,3 +148,6 @@ scipy
 Both generators require only NumPy and SciPy (EMG uses `scipy.signal` for bandpass filtering). No other dependencies.
 
 **Download ICA dataset used in ICAM here**: https://storage.googleapis.com/ica_data/ica_files/public-files/ica_dataset_4500_125h_ppg_regenerated.pkl
+
+**Download ICAM analysis code and models**:
+https://drive.google.com/file/d/1N_dlEhCpdDFhabH6bntjeIeMAlVBqMxi/view?usp=sharing
