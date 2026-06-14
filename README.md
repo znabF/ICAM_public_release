@@ -1,6 +1,6 @@
-# Synthetic Physiologically Plausible EMG and PPG Signal Modeling
+# Repo includes Synthetic Physiologically Plausible EMG and PPG Signal Modeling
 Research contribution made from ICAM (2026). Open source for all researchers in biomedical fields to use where there is lack of real EMG and PPG data collected. 
-
+**At the bottom is the other files**. 
 ## Files
 
 | File | Description |
